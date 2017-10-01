@@ -1,0 +1,3 @@
+public enum PROJECT_COUNTER {
+	RECORD_COUNT
+};

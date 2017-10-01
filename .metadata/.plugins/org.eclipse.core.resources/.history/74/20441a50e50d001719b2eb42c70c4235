@@ -1,0 +1,41 @@
+import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
+
+public class Reducer5 extends Reducer<Text,Text,Text,Text>{
+	
+	/*
+	 * Input: (word, wordAuthorCount|totalAuthorCount)
+	 * Output: word|IDF
+	 */
+	
+	
+	private MultipleOutputs<Text, Text> output;
+	
+	@Override
+	public void setup(Context context){
+		output = new MultipleOutputs<Text, Text>(context);
+	}
+	
+	@Override
+	protected void cleanup(Context context) throws IOException, InterruptedException{
+		output.close();
+	}
+	
+	public void reduce(Text key, Iterable<Text> values, Context context) throws
+	IOException, InterruptedException {
+
+		String[] counts = values.toString().split("\\|");
+		double wordAuthorCount = Double.valueOf(counts[0]);
+		int totalAuthorCount = Integer.valueOf(counts[1]);
+		double = (double)totalAuthorCount;
+		Double idf = Math.log10(totalAuthorCount/wordAuthorCount);
+		
+		output.write("job5output", new Text(key + "|" + idf.toString()), new Text(""));
+	}
+	
+}

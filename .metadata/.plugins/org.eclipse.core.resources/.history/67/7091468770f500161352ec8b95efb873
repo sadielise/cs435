@@ -1,0 +1,63 @@
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+
+public class Reducer1B extends Reducer<Text,Text,Text,Text>{
+	public void reduce(Text key, Iterable<Text> values, Context context) throws
+	IOException, InterruptedException {
+
+		Map<String,Integer> authors = new TreeMap<String,Integer>();
+		
+		for(Text author: values){
+			String authorString = author.toString();
+			if(authors.containsKey(authorString)){
+				authors.put(authorString, authors.get(authorString) + 1);
+			}
+			else{
+				authors.put(authorString, 1);
+			}
+		}
+		
+		for(String yearMapped: years.keySet()){
+			context.write(key, new Text("\t" + yearMapped + "\t" + years.get(yearMapped)));
+		}
+		
+		ArrayList<String> authors = new ArrayList<String>();
+		for(Text author: values){
+			authors.add(author.toString());
+		}
+
+		Collections.sort(authors);
+
+		int currCount = 1;
+		String currAuthor = authors.get(0);
+
+		if(authors.size() == 1){
+			context.write(key, new Text("\t" + currAuthor + "\t" + currCount));
+		}
+		else{
+			for(int i = 1; i < authors.size(); i++){
+				String nextAuthor = authors.get(i);
+				if(currAuthor.equals(nextAuthor)){
+					currCount++;
+					if(i == authors.size()-1){
+						context.write(key, new Text("\t" + currAuthor + "\t" + currCount));
+					}
+				}
+				else{
+					context.write(key, new Text("\t" + currAuthor + "\t" + currCount));
+					currCount = 1;
+					currAuthor = nextAuthor;
+					if(i == authors.size()-1){
+						context.write(key, new Text("\t" + currAuthor + "\t" + currCount));
+					}
+				}
+			}
+		}
+	}
+}

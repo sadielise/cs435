@@ -1,0 +1,24 @@
+import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+
+public class Reducer1B extends Reducer<Text,Text,Text,Text>{
+	public void reduce(Text key, Iterable<Text> values, Context context) throws
+	IOException, InterruptedException {
+
+		Map<String,Integer> authors = new TreeMap<String,Integer>();
+		
+		for(Text author: values){
+			String authorString = author.toString();
+			if(authors.containsKey(authorString)){
+				authors.put(authorString, authors.get(authorString) + 1);
+			}
+			else{
+				authors.put(authorString, 1);
+			}
+		}
+	}
+}

@@ -1,0 +1,64 @@
+import java.io.IOException;
+import java.util.ArrayList;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
+
+public class Reducer14 extends Reducer<Text,Text,Text,Text>{
+
+	/*
+	 * Input: (unknown|author, TFIDF|TFIDF)
+	 * Output: author|cosineSimilarity
+	 */
+
+
+	private MultipleOutputs<Text, Text> output;
+
+	@Override
+	public void setup(Context context){
+		output = new MultipleOutputs<Text, Text>(context);
+	}
+
+	@Override
+	protected void cleanup(Context context) throws IOException, InterruptedException{
+		output.close();
+	}
+
+	public void reduce(Text key, Iterable<Text> values, Context context) throws
+	IOException, InterruptedException {
+
+
+		ArrayList<Double> valsA = new ArrayList<Double>();
+		ArrayList<Double> valsB = new ArrayList<Double>();
+		
+		for(Text val: values){
+			output.write("job14output", val, new Text(""));
+			/*String[] vals = val.toString().split("\\|");
+			double valA = Double.valueOf(vals[0]);
+			double valB = Double.valueOf(vals[1]);
+			valsA.add(valA);
+			valsB.add(valB);*/
+		}
+		
+		/*double numerator = 0;
+		double denominatorA = 0;
+		double denominatorB = 0;
+		for(int i = 0; i < valsA.size(); i++){
+			double a = valsA.get(i);
+			double b = valsB.get(i);
+			numerator += (a * b);
+			denominatorA += (a * a);
+			denominatorB += (b * b);
+		}
+		
+		double rootDenominatorA = Math.sqrt(denominatorA);
+		double rootDenominatorB = Math.sqrt(denominatorB);
+		double denominator = rootDenominatorA * rootDenominatorB;
+		
+		Double cosineSimilarity = numerator/denominator;
+		
+		String[] authors = key.toString().split("\\|");
+		
+		output.write("job14output", new Text(authors[1] + "|" + cosineSimilarity.toString()), new Text(""));*/
+	}
+}

@@ -1,0 +1,111 @@
+
+import java.io.IOException;
+
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.DataOutputBuffer;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.FileSplit;
+import org.apache.hadoop.mapred.InputSplit;
+import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapred.RecordReader;
+import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+
+public class WikiHBaseInputFormat extends TextInputFormat {
+
+	@Override
+	public RecordReader<LongWritable, Text> createRecordReader(InputSplit split, TaskAttemptContext context) throws IOException {
+		return new WikiRecordReader();
+	}
+
+	public class WikiRecordReader implements RecordReader<LongWritable,Text>{
+
+		//class variables
+		private final long start;
+		private final long end;
+		private final FSDataInputStream fsinput;
+		private final DataOutputBuffer buff = new DataOutputBuffer();
+		private final byte[] startRecord;
+		private final byte[] endRecord;
+
+		public WikiRecordReader(FileSplit split, JobConf conf) throws IOException {
+			start = split.getStart();
+			end = start + split.getLength();
+			Path path = split.getPath();
+			FileSystem fs = path.getFileSystem(conf);
+			fsinput = fs.open(path);
+			fsinput.seek(start);
+			startRecord = conf.get("REVISION").getBytes("utf-8");
+			endRecord = conf.get("\n\n").getBytes("utf-8");
+		}
+
+		@Override
+		public void close() throws IOException {
+			fsinput.close();
+		}
+
+		@Override
+		public LongWritable createKey() {
+			return new LongWritable();
+		}
+
+		@Override
+		public Text createValue() {
+			return new Text();
+		}
+
+		@Override
+		public long getPos() throws IOException {
+			return fsinput.getPos();
+		}
+
+		@Override
+		public float getProgress() throws IOException {
+			return (fsinput.getPos() - start)/(float)(end - start); 
+		}
+
+		@Override
+		public boolean next(LongWritable key, Text value) throws IOException {
+			if(fsinput.getPos() < end){
+				if(readUntilMatch(startRecord, false)){
+					try {
+						buff.write(startRecord);
+						if(readUntilMatch(endRecord, true)){
+							key.set(fsinput.getPos());
+							value.set(buff.getData(), 0, buff.getLength());
+							return true;
+						}
+					}
+					finally {
+						buff.reset();
+					}
+				}
+			}
+			return false;
+		}
+
+		private boolean readUntilMatch(byte[] match, boolean inRecord) throws IOException {
+			int index = 0;
+			while(true){
+				int val = fsinput.read();
+				if(val == -1)
+					return false;
+				if(inRecord)
+					buff.write(val);
+				if(val == match[index]){
+					index++;
+					if(index == match.length)
+						return true;
+				}
+				else {
+					index = 0;
+				}
+				if(!inRecord && index == 0 && fsinput.getPos() >= end)
+					return false;
+			}
+		}
+	}
+}

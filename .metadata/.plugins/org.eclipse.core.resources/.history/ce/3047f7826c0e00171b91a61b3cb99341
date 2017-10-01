@@ -1,0 +1,56 @@
+import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
+
+public class Reducer1Online extends Reducer<Text,Text,Text,Text>{
+
+	/*
+	 * Input: (word, author@TFIDF|author@TFIDF|etc...) and (word, unknown@TFIDF)
+	 * Output: word$unknown@TFIDF|author@TFIDF|author@TFIDF|etc...
+	 */
+
+
+	private MultipleOutputs<Text, Text> output;
+
+	@Override
+	public void setup(Context context){
+		output = new MultipleOutputs<Text, Text>(context);
+	}
+
+	@Override
+	protected void cleanup(Context context) throws IOException, InterruptedException{
+		output.close();
+	}
+
+	public void reduce(Text key, Iterable<Text> values, Context context) throws
+	IOException, InterruptedException {
+
+		Map<String,String> tempVals = new TreeMap<String,String>();
+		String unknown = "";
+
+		for(Text val: values){
+			String[] author_TFIDF = val.toString().split("\\|");
+			if(author_TFIDF.length == 1){
+				unknown = author_TFIDF[0].trim();
+			}
+			else{
+				for(String pair: author_TFIDF){
+					if((pair.trim()).length() > 0){
+						tempVals.put(pair, "x");
+					}
+				}
+			}
+		}
+
+		String completeVector = key + "$" + unknown;
+		for(String pair: tempVals.keySet()){
+			completeVector += "|";
+			completeVector += pair;
+		}
+		output.write("job12output", new Text(completeVector), new Text(""));
+	}
+}

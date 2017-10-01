@@ -1,0 +1,28 @@
+import java.io.IOException;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
+
+public class Mapper5 extends Mapper<LongWritable, Text, Text, Text>{
+	
+	/*
+	 * Input: word|wordAuthorCount
+	 * Output: (word, wordAuthorCount|totalAuthorCount)
+	 */
+
+	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException{
+		
+		Configuration conf1 = context.getConfiguration();
+		String totalAuthorCount = conf1.get("authorCount");
+		System.out.println("*****TOTAL AUTHOR COUNT: " + totalAuthorCount);
+
+		//split line into word, wordAuthorCount
+		String[] columns = value.toString().split("\\|"); 
+		String word = columns[0].trim();
+		String wordAuthorCount = columns[1].trim();
+		
+		context.write(new Text(word), new Text(wordAuthorCount + "|" + totalAuthorCount));
+	}
+}

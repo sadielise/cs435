@@ -1,0 +1,270 @@
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Counter;
+import org.apache.hadoop.mapreduce.Counters;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.LazyOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+
+public class MainClass {
+
+	public static void main(String[] args) throws IOException, ClassNotFoundException,
+	InterruptedException {
+		
+		if (args.length != 1) {
+			System.out.printf("Usage: <jar file> <input dir>\n");
+			System.exit(-1);
+		}
+		
+		Configuration conf = new Configuration();
+		
+		/*Job job1 = Job.getInstance(conf);
+		job1.setJarByClass(MainClass.class);
+		job1.setJobName("Word count by author");
+		
+		job1.setOutputKeyClass(Text.class);
+		job1.setOutputValueClass(Text.class);
+		
+		job1.setMapperClass(Mapper1.class);
+		job1.setReducerClass(Reducer1.class);
+
+		job1.setInputFormatClass(TextInputFormat.class);
+		job1.setOutputFormatClass(TextOutputFormat.class);
+		
+		FileInputFormat.setInputPaths(job1, new Path(args[0]));
+		FileOutputFormat.setOutputPath(job1, new Path("/Job1"));
+		LazyOutputFormat.setOutputFormatClass(job1, TextOutputFormat.class);
+		
+		MultipleOutputs.addNamedOutput(job1, "job1output", TextOutputFormat.class, NullWritable.class, Text.class);
+		
+		job1.waitForCompletion(true);*/
+		
+		
+		
+		/*Job job2 = Job.getInstance(conf);
+		job2.setJarByClass(MainClass.class);
+		job2.setJobName("Calculate TF for each word");
+		
+		job2.setOutputKeyClass(Text.class);
+		job2.setOutputValueClass(Text.class);
+		
+		job2.setMapperClass(Mapper2.class);
+		job2.setReducerClass(Reducer2.class);
+
+		job2.setInputFormatClass(TextInputFormat.class);
+		job2.setOutputFormatClass(TextOutputFormat.class);
+		
+		FileInputFormat.setInputPaths(job2, new Path("/Job1/job1output-r-00000"));
+		FileOutputFormat.setOutputPath(job2, new Path("/Job2"));
+		LazyOutputFormat.setOutputFormatClass(job2, TextOutputFormat.class);
+		
+		MultipleOutputs.addNamedOutput(job2, "job2output", TextOutputFormat.class, NullWritable.class, Text.class);
+		
+		System.exit(job2.waitForCompletion(true) ? 0 : 1);*/
+		
+		
+		
+		/*Job job3 = Job.getInstance(conf);
+		job3.setJarByClass(MainClass.class);
+		job3.setJobName("Get author count and list of authors");
+		
+		job3.setOutputKeyClass(Text.class);
+		job3.setOutputValueClass(Text.class);
+		
+		job3.setMapperClass(Mapper3.class);
+		job3.setReducerClass(Reducer3.class);
+
+		job3.setInputFormatClass(TextInputFormat.class);
+		job3.setOutputFormatClass(TextOutputFormat.class);
+		
+		FileInputFormat.setInputPaths(job3, new Path("/Job1/job1output-r-00000"));
+		FileOutputFormat.setOutputPath(job3, new Path("/Job3"));
+		LazyOutputFormat.setOutputFormatClass(job3, TextOutputFormat.class);
+		
+		MultipleOutputs.addNamedOutput(job3, "authors", TextOutputFormat.class, NullWritable.class, Text.class);
+		
+		job3.waitForCompletion(true);
+		Counters counters = job3.getCounters();
+		Counter authorCount = counters.findCounter(PROJECT_COUNTER.AUTHOR_COUNT);
+		Long authorCountLong = authorCount.getValue();
+		
+		
+		
+		Job job4 = Job.getInstance(conf);
+		job4.setJarByClass(MainClass.class);
+		job4.setJobName("Get word collection frequency");
+		
+		job4.setOutputKeyClass(Text.class);
+		job4.setOutputValueClass(Text.class);
+		
+		job4.setMapperClass(Mapper4.class);
+		job4.setReducerClass(Reducer4.class);
+
+		job4.setInputFormatClass(TextInputFormat.class);
+		job4.setOutputFormatClass(TextOutputFormat.class);
+		
+		FileInputFormat.setInputPaths(job4, new Path("/Job1/job1output-r-00000"));
+		FileOutputFormat.setOutputPath(job4, new Path("/Job4"));
+		LazyOutputFormat.setOutputFormatClass(job4, TextOutputFormat.class);
+		
+		MultipleOutputs.addNamedOutput(job4, "job4output", TextOutputFormat.class, NullWritable.class, Text.class);
+
+		job4.waitForCompletion(true);
+		
+
+		
+		conf.set("authorCount", authorCountLong.toString());
+		Job job5 = Job.getInstance(conf);
+		job5.setJarByClass(MainClass.class);
+		job5.setJobName("Get IDF for each word");
+		
+		job5.setOutputKeyClass(Text.class);
+		job5.setOutputValueClass(Text.class);
+		
+		job5.setMapperClass(Mapper5.class);
+		job5.setReducerClass(Reducer5.class);
+
+		job5.setInputFormatClass(TextInputFormat.class);
+		job5.setOutputFormatClass(TextOutputFormat.class);
+		
+		FileInputFormat.setInputPaths(job5, new Path("/Job4/job4output-r-00000"));
+		FileOutputFormat.setOutputPath(job5, new Path("/Job5"));
+		LazyOutputFormat.setOutputFormatClass(job5, TextOutputFormat.class);
+		
+		MultipleOutputs.addNamedOutput(job5, "job5output", TextOutputFormat.class, NullWritable.class, Text.class);
+		
+		job5.waitForCompletion(true);*/
+		
+		
+		
+		/*Job job7 = Job.getInstance(conf);
+		job7.setJarByClass(MainClass.class);
+		job7.setJobName("Get list of all words");
+		
+		job7.setOutputKeyClass(Text.class);
+		job7.setOutputValueClass(Text.class);
+		
+		job7.setMapperClass(Mapper7.class);
+		job7.setReducerClass(Reducer7.class);
+
+		job7.setInputFormatClass(TextInputFormat.class);
+		job7.setOutputFormatClass(TextOutputFormat.class);
+		
+		FileInputFormat.setInputPaths(job7, new Path("/Job1/job1output-r-00000"));
+		FileOutputFormat.setOutputPath(job7, new Path("/Job7"));
+		LazyOutputFormat.setOutputFormatClass(job7, TextOutputFormat.class);
+		
+		MultipleOutputs.addNamedOutput(job7, "words", TextOutputFormat.class, NullWritable.class, Text.class);
+		
+		job7.waitForCompletion(true);*/
+		
+		
+		
+		/*Job job9 = Job.getInstance(conf);
+		try {
+			job9.addCacheFile(new URI("/Job3/authors-r-00000"+"#authorsFile"));
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		job9.setJarByClass(MainClass.class);
+		job9.setJobName("Get complete list of TF of each word by author");
+		
+		job9.setOutputKeyClass(Text.class);
+		job9.setOutputValueClass(Text.class);
+		
+		job9.setMapperClass(Mapper9.class);
+		job9.setReducerClass(Reducer9.class);
+
+		job9.setInputFormatClass(TextInputFormat.class);
+		job9.setOutputFormatClass(TextOutputFormat.class);
+		
+		FileInputFormat.setInputPaths(job9, new Path("/Job2/job2output-r-00000"));
+		FileOutputFormat.setOutputPath(job9, new Path("/Job9"));
+		LazyOutputFormat.setOutputFormatClass(job9, TextOutputFormat.class);
+		
+		MultipleOutputs.addNamedOutput(job9, "job9output", TextOutputFormat.class, NullWritable.class, Text.class);
+		
+		job9.waitForCompletion(true);*/
+		
+		
+		
+		/*Job job10 = Job.getInstance(conf);
+		job10.setJarByClass(MainClass.class);
+		job10.setJobName("Get complete list of TF.IDF of each word by author");
+		
+		job10.setOutputKeyClass(Text.class);
+		job10.setOutputValueClass(Text.class);
+		
+		job10.setMapperClass(Mapper10.class);
+		job10.setReducerClass(Reducer10.class);
+
+		job10.setInputFormatClass(TextInputFormat.class);
+		job10.setOutputFormatClass(TextOutputFormat.class);
+		
+		FileInputFormat.setInputPaths(job10, new Path("/Job5/job5output-r-00000"), new Path("/Job9/job9output-r-00000"));
+		FileOutputFormat.setOutputPath(job10, new Path("/Job10"));
+		LazyOutputFormat.setOutputFormatClass(job10, TextOutputFormat.class);
+		
+		MultipleOutputs.addNamedOutput(job10, "job10output", TextOutputFormat.class, NullWritable.class, Text.class);
+		
+		job10.waitForCompletion(true);*/
+		
+		
+		
+		Job job11 = Job.getInstance(conf);
+		job11.setJarByClass(MainClass.class);
+		job11.setJobName("Sort complete TF.IDF list by author");
+		
+		job11.setOutputKeyClass(Text.class);
+		job11.setOutputValueClass(Text.class);
+		
+		job11.setMapperClass(Mapper11.class);
+		job11.setReducerClass(Reducer11.class);
+
+		job11.setInputFormatClass(TextInputFormat.class);
+		job11.setOutputFormatClass(TextOutputFormat.class);
+		
+		FileInputFormat.setInputPaths(job11, new Path("/Job10/job10output-r-00000"));
+		FileOutputFormat.setOutputPath(job11, new Path("/Job11"));
+		LazyOutputFormat.setOutputFormatClass(job11, TextOutputFormat.class);
+		
+		MultipleOutputs.addNamedOutput(job11, "job11output", TextOutputFormat.class, NullWritable.class, Text.class);
+		
+		System.exit(job11.waitForCompletion(true) ? 0 : 1);
+		
+		
+		
+		/*Job job12 = Job.getInstance(conf);
+		job12.setJarByClass(MainClass.class);
+		job12.setJobName("Create inverted TF.IDF vector");
+		
+		job12.setOutputKeyClass(Text.class);
+		job12.setOutputValueClass(Text.class);
+		
+		job12.setMapperClass(Mapper12.class);
+		job12.setReducerClass(Reducer12.class);
+
+		job12.setInputFormatClass(TextInputFormat.class);
+		job12.setOutputFormatClass(TextOutputFormat.class);
+		
+		FileInputFormat.setInputPaths(job12, new Path("/Job11/job11output-r-00000"));
+		FileOutputFormat.setOutputPath(job12, new Path("/Job12"));
+		LazyOutputFormat.setOutputFormatClass(job12, TextOutputFormat.class);
+		
+		MultipleOutputs.addNamedOutput(job12, "job12output", TextOutputFormat.class, NullWritable.class, Text.class);
+		
+		System.exit(job12.waitForCompletion(true) ? 0 : 1);*/
+	}
+
+}

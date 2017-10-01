@@ -1,0 +1,99 @@
+import java.io.IOException;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.LazyOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+
+public class MainClassOnline {
+	
+	public static enum PROJECT_COUNTER {
+		AUTHOR_COUNT
+	};
+
+	public static void main(String[] args) throws IOException, ClassNotFoundException,
+	InterruptedException {
+		
+		if (args.length != 1) {
+			System.out.printf("Usage: <jar file> <input dir>\n");
+			System.exit(-1);
+		}
+		
+		Configuration conf = new Configuration();
+		
+		Job job1 = Job.getInstance(conf);
+		job1.setJarByClass(MainClassOnline.class);
+		job1.setJobName("Add unknown author TF.IDF to corpus TF.IDF");
+		
+		job1.setOutputKeyClass(Text.class);
+		job1.setOutputValueClass(Text.class);
+		
+		job1.setMapperClass(Mapper1Online.class);
+		job1.setReducerClass(Reducer1Online.class);
+
+		job1.setInputFormatClass(TextInputFormat.class);
+		job1.setOutputFormatClass(TextOutputFormat.class);
+		
+		FileInputFormat.setInputPaths(job1, new Path("/Job11/job11output-r-00000"));
+		FileOutputFormat.setOutputPath(job1, new Path("/Job1Online"));
+		LazyOutputFormat.setOutputFormatClass(job1, TextOutputFormat.class);
+		
+		MultipleOutputs.addNamedOutput(job1, "onlinejob1output", TextOutputFormat.class, NullWritable.class, Text.class);
+		
+		job1.waitForCompletion(true);
+		
+		
+		
+		Job job2 = Job.getInstance(conf);
+		job2.setJarByClass(MainClassOnline.class);
+		job2.setJobName("Get cosine similarity");
+		
+		job2.setOutputKeyClass(Text.class);
+		job2.setOutputValueClass(Text.class);
+		
+		job2.setMapperClass(Mapper2Online.class);
+		job2.setReducerClass(Reducer2Online.class);
+
+		job2.setInputFormatClass(TextInputFormat.class);
+		job2.setOutputFormatClass(TextOutputFormat.class);
+		
+		FileInputFormat.setInputPaths(job2, new Path("/Job1Online/onlinejob1output-r-00000"));
+		FileOutputFormat.setOutputPath(job2, new Path("/Job2Online"));
+		LazyOutputFormat.setOutputFormatClass(job2, TextOutputFormat.class);
+		
+		MultipleOutputs.addNamedOutput(job2, "onlinejob2output", TextOutputFormat.class, NullWritable.class, Text.class);
+		
+		job2.waitForCompletion(true);
+		
+		
+		
+		Job job3 = Job.getInstance(conf);
+		job3.setJarByClass(MainClassOnline.class);
+		job3.setJobName("Get top 10 authors");
+		
+		job3.setOutputKeyClass(Text.class);
+		job3.setOutputValueClass(Text.class);
+		
+		job3.setMapperClass(Mapper3Online.class);
+		job3.setReducerClass(Reducer3Online.class);
+
+		job3.setInputFormatClass(TextInputFormat.class);
+		job3.setOutputFormatClass(TextOutputFormat.class);
+		
+		FileInputFormat.setInputPaths(job3, new Path("/Job2Online/onlinejob2output-r-00000"));
+		FileOutputFormat.setOutputPath(job3, new Path("/Job3Online"));
+		LazyOutputFormat.setOutputFormatClass(job3, TextOutputFormat.class);
+		
+		MultipleOutputs.addNamedOutput(job3, "onlinejob3output", TextOutputFormat.class, NullWritable.class, Text.class);
+		
+		System.exit(job3.waitForCompletion(true) ? 0 : 1);
+		
+	}
+
+}

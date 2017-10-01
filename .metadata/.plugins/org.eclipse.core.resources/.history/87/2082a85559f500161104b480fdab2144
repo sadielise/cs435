@@ -1,0 +1,29 @@
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+
+public class Reducer1A extends Reducer<Text,Text,Text,Text>{
+	public void reduce(Text key, Iterable<Text> values, Context context) throws
+	IOException, InterruptedException {
+
+		Map<Text,Integer> years = new TreeMap<Text,Integer>();
+			
+		for(Text year: values){
+			if(years.containsKey(year)){
+				years.put(year, years.get(year) + 1);
+			}
+			else{
+				years.put(year, 1);
+			}
+		}
+		
+		for(Text year: years.keySet()){
+			context.write(key, new Text("\t" + year + "\t" + years.get(year)));
+		}
+	}
+}

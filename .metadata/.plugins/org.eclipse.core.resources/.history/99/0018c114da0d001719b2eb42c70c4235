@@ -1,0 +1,48 @@
+import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
+
+public class Reducer3 extends Reducer<Text,Text,Text,Text>{
+	
+	/*
+	 * Input: (x, author)
+	 * Output: totalAuthorCount and $author
+	 */
+	
+	public static enum PROJECT_COUNTER {
+		AUTHOR_COUNT
+	};
+	
+	private MultipleOutputs<Text, Text> output;
+	
+	@Override
+	public void setup(Context context){
+		output = new MultipleOutputs<Text, Text>(context);
+	}
+	
+	@Override
+	protected void cleanup(Context context) throws IOException, InterruptedException{
+		output.close();
+	}
+	
+	public void reduce(Text key, Iterable<Text> values, Context context) throws
+	IOException, InterruptedException {
+
+		Map<String,Integer> authors = new TreeMap<String,Integer>();
+
+		// put all authors into tree map (doesn't allow duplicates)
+		for(Text val: values){
+			authors.put(val.toString(), 0);
+		}
+		
+		// pull out deduped authors
+		for(String author: authors.keySet()){
+			context.getCounter(PROJECT_COUNTER.AUTHOR_COUNT).increment(1);
+			output.write("authors", new Text("$" + author), new Text(""));
+		}
+	}
+}

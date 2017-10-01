@@ -1,0 +1,45 @@
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+
+public class Reducer2B extends Reducer<Text,Text,Text,Text>{
+	public void reduce(Text key, Iterable<Text> values, Context context) throws
+	IOException, InterruptedException {
+
+		ArrayList<String> authors = new ArrayList<String>();
+		for(Text author: values){
+			authors.add(author.toString());
+		}
+
+		Collections.sort(authors);
+
+		int currCount = 1;
+		String currAuthor = authors.get(0);
+
+		if(authors.size() == 1){
+			context.write(key, new Text("\t" + currAuthor + "\t" + currCount));
+		}
+		else{
+			for(int i = 1; i < authors.size(); i++){
+				String nextAuthor = authors.get(i);
+				if(currAuthor.equals(nextAuthor)){
+					currCount++;
+					if(i == authors.size()-1){
+						context.write(key, new Text("\t" + currAuthor + "\t" + currCount));
+					}
+				}
+				else{
+					context.write(key, new Text("\t" + currAuthor + "\t" + currCount));
+					currCount = 1;
+					currAuthor = nextAuthor;
+					if(i == authors.size()-1){
+						context.write(key, new Text("\t" + currAuthor + "\t" + currCount));
+					}
+				}
+			}
+		}
+	}
+}

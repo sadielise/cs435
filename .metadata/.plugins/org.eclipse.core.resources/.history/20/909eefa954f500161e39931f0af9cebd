@@ -1,0 +1,43 @@
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Reducer;
+
+public class Reducer1A extends Reducer<Text,Text,Text,Text>{
+	public void reduce(Text key, Iterable<Text> values, Context context) throws
+	IOException, InterruptedException {
+
+		Map<Text,Integer> years = new HashMap<Text,Integer>();
+			
+
+		int currCount = 1;
+		String currYear = years.get(0);
+
+		if(years.size() == 1){
+			context.write(key, new Text("\t" + currYear + "\t" + currCount));
+		}
+		else{
+			for(int i = 1; i < years.size(); i++){
+				String nextYear = years.get(i);
+				if(currYear.equals(nextYear)){
+					currCount++;
+					if(i == years.size()-1){
+						context.write(key, new Text("\t" + currYear + "\t" + currCount));
+					}
+				}
+				else{
+					context.write(key, new Text("\t" + currYear + "\t" + currCount));
+					currCount = 1;
+					currYear = nextYear;
+					if(i == years.size()-1){
+						context.write(key, new Text("\t" + currYear + "\t" + currCount));
+					}
+				}
+			}
+		}
+	}
+}
